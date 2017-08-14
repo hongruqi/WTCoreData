@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'WTCoreData_Example' do
+  pod 'WTCoreData', :path => '../'
+
+  target 'WTCoreData_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
