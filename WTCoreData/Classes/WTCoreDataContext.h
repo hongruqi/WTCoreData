@@ -1,5 +1,5 @@
 //
-//  WTCoreDataObjectContext.h
+//  WTCoreDataContext.h
 //  WTCoreData
 //
 //  Created by walter on 14/08/2017.
@@ -7,13 +7,13 @@
 
 #import <Foundation/Foundation.h>
 
-@class WTCoreDataServiceContext;
-@class WTCoreDataModel;
+@class WTCoreDataFMDB;
+@class WTCoreDataObject;
 
-@interface WTCoreDataObjectContext : NSObject
+@interface WTCoreDataContext : NSObject
 
-@property(nonatomic,strong,readonly)WTCoreDataServiceContext *serviceContext;
-@property(nonatomic,strong,readonly)WTCoreDataModel *objectModel;
+@property(nonatomic, strong, readonly) WTCoreDataFMDB *coreDataFMDB;
+@property(nonatomic, strong, readonly) WTCoreDataObject *objectModel;
 
 - (instancetype)initWithObjectClass:(Class)objectClass version:(NSString*)version;
 
@@ -21,7 +21,6 @@
 
 - (NSString*)tableName;
 
-#pragma mark -
 #pragma mark - 表内接口
 
 - (NSUInteger)countOfContext;
@@ -46,14 +45,12 @@
 
 - (NSArray*)fetchWithWhereSql:(NSString*)whereSql withArgumentsInArray:(NSArray *)arguments;
 
-#pragma mark -
 #pragma mark - 通用接口
 
 - (BOOL)executeUpdate:(NSString*)sql withArgumentsInArray:(NSArray *)arguments;
 
 - (NSArray*)executeQuery:(NSString *)sql withArgumentsInArray:(NSArray *)arguments;
 
-#pragma mark -
 #pragma mark - Transactions
 
 - (BOOL)rollback;

@@ -1,5 +1,5 @@
 //
-//  WTCoreDataServiceContext.h
+//  WTCoreDataFMDB.h
 //  WTCoreData
 //
 //  Created by walter on 14/08/2017.
@@ -9,7 +9,7 @@
 
 @class FMDatabaseQueue;
 
-@interface WTCoreDataServiceContext : NSObject
+@interface WTCoreDataFMDB : NSObject
 
 + (instancetype)shareInstance;
 
@@ -17,9 +17,9 @@
 
 - (BOOL)isNeedCreateTable:(NSString*)table;
 
-- (BOOL)isNeedUpgradeForTable:(NSString*)table compareVersion:(NSString*)compareVersion;
+- (BOOL)isNeedUpgradeForTable:(NSString*)isNeedUpgradeForTable compareVersion:(NSString*)compareVersion;
 
-- (BOOL)dropTable:(NSString*)table;
+- (BOOL)dropTable:(NSString*)dropTable;
 
 - (BOOL)updateTableToLastestVersion:(NSString*)version forTable:(NSString*)table;
 @end

@@ -70,6 +70,10 @@
     [array enumerateObjectsUsingBlock:^(WTUserInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"obj %@", obj.interest);
     }];
+    
+    NSInteger count = [context countOfContext];
+    NSLog(@"count = %d", count);
+    
 }
 
 //- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

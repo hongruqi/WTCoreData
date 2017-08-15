@@ -1,40 +1,40 @@
 //
-//  WTCoreDataServiceContext.m
+//  WTCoreDataFMDB.m
 //  WTCoreData
 //
 //  Created by walter on 14/08/2017.
 //
 
-#import "WTCoreDataServiceContext.h"
+#import "WTCoreDataFMDB.h"
 #import "FMDatabaseQueue.h"
 #import "FMDatabase.h"
 
 #define WT_COREDATA_DATABASE_NAME     @"wtcoredata.db"
 #define WT_COREDATA_FOLDER_PATH       @"wtcoredata"
 
-@interface WTCoreDataServiceContext()
+@interface WTCoreDataFMDB()
 
 @property(nonatomic,strong)FMDatabaseQueue *dbQueue;
 
 @end
 
-@implementation WTCoreDataServiceContext
+@implementation WTCoreDataFMDB
 
 + (instancetype)shareInstance
 {
-    static WTCoreDataServiceContext *serviceContext = nil;
+    static WTCoreDataFMDB *instance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        serviceContext = [[WTCoreDataServiceContext alloc] init];
+        instance = [[WTCoreDataFMDB alloc] init];
     });
-    return serviceContext;
+    return instance;
 }
 
 -(instancetype)init
 {
     self = [super init];
     if(self){
-        _dbQueue = [[FMDatabaseQueue alloc] initWithPath:[WTCoreDataServiceContext databasePath]];
+        _dbQueue = [[FMDatabaseQueue alloc] initWithPath:[self databasePath]];
         [self createTableInfo];
     }
     return self;

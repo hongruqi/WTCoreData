@@ -1,5 +1,5 @@
 //
-//  WTCoreDataModel.h
+//  WTCoreDataObject.h
 //  WTCoreData
 //
 //  Created by walter on 14/08/2017.
@@ -10,7 +10,7 @@
 @class WTCoreDataAssociateObject;
 @class WTCoreDataColumnParis;
 
-@interface WTCoreDataModel : NSObject
+@interface WTCoreDataObject : NSObject
 
 @property(nonatomic,strong,readonly)NSMutableArray *associateObjectArray;
 

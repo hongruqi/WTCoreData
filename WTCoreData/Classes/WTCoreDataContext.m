@@ -5,37 +5,37 @@
 //  Created by walter on 14/08/2017.
 //
 
-#import "WTCoreDataObjectContext.h"
-#import "WTCoreDataServiceContext.h"
-#import "WTCoreDataModel.h"
+#import "WTCoreDataContext.h"
+#import "WTCoreDataFMDB.h"
+#import "WTCoreDataObject.h"
 #import "FMDatabaseQueue.h"
 #import "FMDatabase.h"
 
-@interface WTCoreDataObjectContext()
+@interface WTCoreDataContext()
 {
     BOOL isCheckTable;
 }
 
-@property(nonatomic, strong) WTCoreDataModel *objectModel;
+@property(nonatomic, strong) WTCoreDataObject *objectModel;
 @property(nonatomic, strong) Class mappingObjectClass;
 @property(nonatomic, copy) NSString *version;
 
 @end
 
-@implementation WTCoreDataObjectContext
+@implementation WTCoreDataContext
 
 -(instancetype)initWithObjectClass:(Class)objectClass version:(NSString*)version
 {
-    return [self initWithServiceContext:[WTCoreDataServiceContext shareInstance] objectClass:objectClass version:version];
+    return [self initWithFMDB:[WTCoreDataFMDB shareInstance] objectClass:objectClass version:version];
 }
 
--(instancetype)initWithServiceContext:(WTCoreDataServiceContext *)serviceContext objectClass:(__unsafe_unretained Class)objectClass version:(NSString*)version
+-(instancetype)initWithFMDB:(WTCoreDataFMDB *)coreDataFMDB objectClass:(__unsafe_unretained Class)objectClass version:(NSString*)version
 {
     self = [super init];
     if(self){
         self.mappingObjectClass = objectClass;
-        _serviceContext = serviceContext;
-        self.objectModel = [[WTCoreDataModel alloc] initWithObjectClass:[self objectClass]];
+        _coreDataFMDB = coreDataFMDB;
+        self.objectModel = [[WTCoreDataObject alloc] initWithObjectClass:[self objectClass]];
         self.version = version;
     }
     return self;
@@ -53,18 +53,18 @@
 {
     NSString *tableName = [self tableName];
     BOOL result = YES;
-    if([self.serviceContext isNeedCreateTable:tableName]){
+    if([self.coreDataFMDB isNeedCreateTable:tableName]){
         NSString *createTableSql = [self.objectModel createTableSqlString];
         result = [self executeUpdate:createTableSql withArgumentsInArray:nil];
     }
     if(!result){
         return NO;
     }
-    BOOL isNeedUpgrade = [self.serviceContext isNeedUpgradeForTable:tableName compareVersion:self.version];
+    BOOL isNeedUpgrade = [self.coreDataFMDB isNeedUpgradeForTable:tableName compareVersion:self.version];
     if(isNeedUpgrade){
         [self doUpgradeTable];
     }
-    return [self.serviceContext updateTableToLastestVersion:self.version forTable:tableName];
+    return [self.coreDataFMDB updateTableToLastestVersion:self.version forTable:tableName];
 }
 
 - (NSDictionary *)databaseTableColumnInfo
@@ -169,7 +169,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block NSUInteger count = 0;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         NSMutableString *sql = [NSMutableString stringWithFormat:@"SELECT COUNT(*) FROM %@",[self tableName]];
         if([whereSql length] > 0){
             [sql appendFormat:@" WHERE %@",whereSql];
@@ -194,7 +194,7 @@
     }
     if([self.objectModel associateObjectArray].count > 0){
         for(WTCoreDataAssociateObject *associateObject in self.objectModel.associateObjectArray){
-            WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:associateObject.associateClass version:self.version];
+            WTCoreDataContext *context = [[WTCoreDataContext alloc] initWithObjectClass:associateObject.associateClass version:self.version];
             id value = nil;
             if([object respondsToSelector:NSSelectorFromString(associateObject.propertyName)]){
                 value = [object valueForKey:associateObject.propertyName];
@@ -209,7 +209,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = YES;
-    [self.serviceContext.databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
+    [self.coreDataFMDB.databaseQueue inTransaction:^(FMDatabase *db, BOOL *rollback) {
         for(id object in objectArray){
             NSArray *paramArray = nil;
             NSString *insertSql = [self.objectModel insertSqlForObject:object paramsArray:&paramArray];
@@ -218,7 +218,7 @@
             }
             if([self.objectModel associateObjectArray].count > 0){
                 for(WTCoreDataAssociateObject *associateObject in self.objectModel.associateObjectArray){
-                    WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:associateObject.associateClass version:self.version];
+                    WTCoreDataContext *context = [[WTCoreDataContext alloc] initWithObjectClass:associateObject.associateClass version:self.version];
                     id value = nil;
                     if([object respondsToSelector:NSSelectorFromString(associateObject.propertyName)]){
                         value = [object valueForKey:associateObject.propertyName];
@@ -245,7 +245,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = YES;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         NSMutableString *deleteSql = [NSMutableString stringWithFormat:@"DELETE FROM %@",[self tableName]];
         if([whereSql length] > 0){
             [deleteSql appendFormat:@" WHERE %@",whereSql];
@@ -272,12 +272,12 @@
     }
     [self checkTableCreateAndUpgrade];
     NSMutableArray *resultArray = [NSMutableArray array];
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         NSString *sql = nil;
         if([self.objectModel associateObjectArray].count > 0){
             NSMutableString *associateSql = [NSMutableString stringWithFormat:@"SELECT * FROM %@",[self tableName]];
             for(WTCoreDataAssociateObject *associateObject in [self.objectModel associateObjectArray]){
-                WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:associateObject.associateClass version:self.version];
+                WTCoreDataContext *context = [[WTCoreDataContext alloc] initWithObjectClass:associateObject.associateClass version:self.version];
                 NSString *associateColumnName = [self.objectModel columnNameForAssociateObject:associateObject];
                 [associateSql appendFormat:@" LEFT JOIN %@ ON %@.%@ = %@.%@ ",[context.objectModel tableName],[self tableName],associateColumnName,[context.objectModel tableName],associateColumnName];
             }
@@ -304,7 +304,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = NO;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         result = [db executeUpdate:sql withArgumentsInArray:arguments];
     }];
     return result;
@@ -314,7 +314,7 @@
 {
     [self checkTableCreateAndUpgrade];
     NSMutableArray *resultArray = [NSMutableArray array];
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         FMResultSet *set = [db executeQuery:sql withArgumentsInArray:arguments];
         while([set next]){
             [resultArray addObject:[set resultDictionary]];
@@ -331,7 +331,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = NO;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         result = [db rollback];
     }];
     return result;
@@ -341,7 +341,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = NO;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         result = [db commit];
     }];
     return result;
@@ -351,7 +351,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = NO;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         result = [db beginDeferredTransaction];
     }];
     return result;
@@ -361,7 +361,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = NO;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         result = [db beginTransaction];
     }];
     return result;
@@ -371,7 +371,7 @@
 {
     [self checkTableCreateAndUpgrade];
     __block BOOL result = NO;
-    [self.serviceContext.databaseQueue inDatabase:^(FMDatabase *db) {
+    [self.coreDataFMDB.databaseQueue inDatabase:^(FMDatabase *db) {
         result = [db isInTransaction];
     }];
     return result;

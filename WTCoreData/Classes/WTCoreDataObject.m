@@ -1,15 +1,15 @@
 //
-//  WTCoreDataModel.m
+//  WTCoreDataObject.m
 //  WTCoreData
 //
 //  Created by walter on 14/08/2017.
 //
 
-#import "WTCoreDataModel.h"
+#import "WTCoreDataObject.h"
 #import <objc/runtime.h>
 #import "NSObject+WTCoreData.h"
 
-@interface WTCoreDataModel()
+@interface WTCoreDataObject()
 {
     Class _objectClass;
 }
@@ -19,7 +19,7 @@
 
 @end
 
-@implementation WTCoreDataModel
+@implementation WTCoreDataObject
 
 - (instancetype)initWithObjectClass:(Class)objectClass
 {
@@ -88,24 +88,6 @@
                         [self.columnParisMap setObject:pairs forKey:pairs.columnName];
                     }
                 }
-//
-//                if([_objectClass isAssociateProperty:columnName] && [properType length] > 3){
-//                    NSString *className = [properType substringWithRange:NSMakeRange(2, [properType length] - 3)];
-//                    Class associateClass = NSClassFromString(className);
-//                    if(associateClass && [associateClass isSubclassOfClass:[WTCoreDataObject class]]){
-//                        WTCoreDataAssociateObject *associateObject = [[WTCoreDataAssociateObject alloc] init];
-//                        associateObject.associateClass = associateClass;
-//                        associateObject.propertyName = columnName;
-//                        [self.associateObjectArray addObject:associateObject];
-//                    }
-//                }else {
-//                    if([columnName length] > 0 && [columnType length] > 0){
-//                        WTCoreDataColumnParis *pairs = [[WTCoreDataColumnParis alloc] init];
-//                        pairs.columnName = columnName;
-//                        pairs.columnType = columnType;
-//                        [self.columnParisMap setObject:pairs forKey:pairs.columnName];
-//                    }
-//                }
             }
             
             free(properties);
