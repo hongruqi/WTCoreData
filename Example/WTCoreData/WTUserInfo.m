@@ -7,12 +7,11 @@
 //
 
 #import "WTUserInfo.h"
+#import "NSObject+WTCoreData.h"
 
 @implementation WTUserInfo
-
-+(NSString*)primaryKey
++ (NSString *)primaryKey
 {
     return @"name";
 }
-
 @end

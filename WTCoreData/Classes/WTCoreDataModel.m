@@ -7,7 +7,7 @@
 
 #import "WTCoreDataModel.h"
 #import <objc/runtime.h>
-#import "WTCoreDataProtocol.h"
+#import "NSObject+WTCoreData.h"
 
 @interface WTCoreDataModel()
 {

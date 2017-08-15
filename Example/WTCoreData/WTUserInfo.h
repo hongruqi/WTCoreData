@@ -7,9 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "WTCoreDataProtocol.h"
 
-@interface WTUserInfo : NSObject <WTCoreDataProtocol>
+
+@interface WTUserInfo : NSObject
 
 @property (nonatomic, copy) NSString *name;
 @property (nonatomic, copy) NSString *contry;

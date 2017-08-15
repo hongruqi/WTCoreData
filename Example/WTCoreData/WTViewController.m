@@ -12,7 +12,10 @@
 
 @interface WTViewController ()<UITableViewDelegate, UITableViewDataSource>
 
-@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) UIButton *insertDB;
+@property (nonatomic, strong) UIButton *updateDB;
+@property (nonatomic, strong) UIButton *getItemDB;
+
 
 @end
 
@@ -26,22 +29,47 @@
 //    [self.view addSubview:self.tableView];
 //    self.tableView.delegate = self;
 //    self.tableView.dataSource = self;
+    self.insertDB = [[UIButton alloc] initWithFrame:CGRectMake(100, 100, 100, 50)];
+    [self.view addSubview:self.insertDB];
+    [self.insertDB setTitle:@"insert" forState:UIControlStateNormal];
+    [self.insertDB setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [self.insertDB addTarget:self action:@selector(insert) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.updateDB = [[UIButton alloc] initWithFrame:CGRectMake(100, 200, 100, 50)];
+    [self.view addSubview:self.updateDB];
+    [self.updateDB setTitle:@"update" forState:UIControlStateNormal];
+    [self.updateDB setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [self.updateDB addTarget:self action:@selector(update) forControlEvents:UIControlEventTouchUpInside];
+    
+    self.getItemDB = [[UIButton alloc] initWithFrame:CGRectMake(100, 300, 100, 50)];
+    [self.view addSubview:self.getItemDB];
+    [self.getItemDB setTitle:@"get" forState:UIControlStateNormal];
+    [self.getItemDB setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
+    [self.getItemDB addTarget:self action:@selector(get) forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)insert
+{
     WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:[WTUserInfo class] version:@"2.0.0"];
-    NSMutableArray *array = [NSMutableArray array];
     for (int i = 0; i < 100; i++) {
         WTUserInfo *userinfo = [[WTUserInfo alloc] init];
-        userinfo.name = @"qihr";
+        userinfo.name = [NSString stringWithFormat:@"qihr%d", i];
         userinfo.contry = @"china";
         userinfo.age = i;
         userinfo.male = NO;
         userinfo.interest = @[@"1",@"2"];
         [context insertOrReplaceObject:userinfo];
     }
-    
-//    NSArray *arry = [context fetchAllObjects];
-//    NSLog(@"%@", array);
-//    [context insertOrReplaceObjects:array];
+}
 
+- (void)get
+{
+    WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:[WTUserInfo class] version:@"2.0.0"];
+    NSArray *array = [context fetchAllObjects];
+    
+    [array enumerateObjectsUsingBlock:^(WTUserInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSLog(@"obj %@", obj.interest);
+    }];
 }
 
 //- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

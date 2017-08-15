@@ -1,11 +1,15 @@
 //
-//  WTCoreDataProtocol.h
+//  NSObject+WTCoreData.h
 //  WTCoreData
 //
-//  Created by walter on 14/08/2017.
+//  Created by walter on 15/08/2017.
 //
 
 #import <Foundation/Foundation.h>
+
+@interface NSObject (WTCoreData)
+
+@end
 
 @protocol WTCoreDataProtocol <NSObject>
 
