@@ -9,7 +9,7 @@
 #define WTCoreData_h
 
 #import "NSObject+WTCoreData.h"
-#import "WTCoreDataModel.h"
-#import "WTCoreDataObjectContext.h"
+#import "WTCoreDataObject.h"
+#import "WTCoreDataContext.h"
 
 #endif /* WTCoreData_h */
