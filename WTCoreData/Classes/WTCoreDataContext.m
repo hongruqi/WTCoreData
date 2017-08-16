@@ -29,7 +29,7 @@
     return [self initWithFMDB:[WTCoreDataFMDB shareInstance] objectClass:objectClass version:version];
 }
 
--(instancetype)initWithFMDB:(WTCoreDataFMDB *)coreDataFMDB objectClass:(__unsafe_unretained Class)objectClass version:(NSString*)version
+-(instancetype)initWithFMDB:(WTCoreDataFMDB *)coreDataFMDB objectClass:(Class)objectClass version:(NSString*)version
 {
     self = [super init];
     if(self){
@@ -125,7 +125,7 @@
                 [self executeUpdate:sql withArgumentsInArray:nil];
             }
         }
-        //改名为零时表
+        //改名为临时表
         NSString *tmpTableName = @"TMP";
         NSString *renameSql = [NSString stringWithFormat:@"ALTER TABLE %@ RENAME TO %@",tableName,tmpTableName];
         [self executeUpdate:renameSql withArgumentsInArray:nil];
@@ -134,7 +134,7 @@
         //拷贝数据
         NSString *copyDataSql = [NSString stringWithFormat:@"INSERT INTO %@ %@ FROM %@",tableName,selectSql,tmpTableName];
         [self executeUpdate:copyDataSql withArgumentsInArray:nil];
-        //删除零时表
+        //删除临时表
         [self executeUpdate:[NSString stringWithFormat:@"DROP TABLE %@",tmpTableName] withArgumentsInArray:nil];
         result = nil;
     }

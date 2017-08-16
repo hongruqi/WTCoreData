@@ -7,10 +7,10 @@
 //
 
 #import "WTViewController.h"
-#import "WTCoreDataObjectContext.h"
+#import "WTCoreDataContext.h"
 #import "WTUserInfo.h"
 
-@interface WTViewController ()<UITableViewDelegate, UITableViewDataSource>
+@interface WTViewController ()
 
 @property (nonatomic, strong) UIButton *insertDB;
 @property (nonatomic, strong) UIButton *updateDB;
@@ -24,11 +24,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
-//    self.tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height) style:UITableViewStylePlain];
-//    [self.view addSubview:self.tableView];
-//    self.tableView.delegate = self;
-//    self.tableView.dataSource = self;
     self.insertDB = [[UIButton alloc] initWithFrame:CGRectMake(100, 100, 100, 50)];
     [self.view addSubview:self.insertDB];
     [self.insertDB setTitle:@"insert" forState:UIControlStateNormal];
@@ -50,7 +45,7 @@
 
 - (void)insert
 {
-    WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:[WTUserInfo class] version:@"2.0.0"];
+    WTCoreDataContext *context = [[WTCoreDataContext alloc] initWithObjectClass:[WTUserInfo class] version:@"2.0.0"];
     for (int i = 0; i < 100; i++) {
         WTUserInfo *userinfo = [[WTUserInfo alloc] init];
         userinfo.name = [NSString stringWithFormat:@"qihr%d", i];
@@ -64,31 +59,15 @@
 
 - (void)get
 {
-    WTCoreDataObjectContext *context = [[WTCoreDataObjectContext alloc] initWithObjectClass:[WTUserInfo class] version:@"2.0.0"];
+    WTCoreDataContext *context = [[WTCoreDataContext alloc] initWithObjectClass:[WTUserInfo class] version:@"2.0.0"];
     NSArray *array = [context fetchAllObjects];
-    
     [array enumerateObjectsUsingBlock:^(WTUserInfo *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         NSLog(@"obj %@", obj.interest);
     }];
-    
     NSInteger count = [context countOfContext];
-    NSLog(@"count = %d", count);
-    
+    NSLog(@"count = %ld", (long)count);
 }
 
-//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-//{
-//    return 5;
-//}
-//
-//- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"TableViewCell"];
-//    if (cell) {
-//
-//    }
-//    return
-//}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];

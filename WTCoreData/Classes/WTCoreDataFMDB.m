@@ -34,7 +34,7 @@
 {
     self = [super init];
     if(self){
-        _dbQueue = [[FMDatabaseQueue alloc] initWithPath:[self databasePath]];
+        _dbQueue = [[FMDatabaseQueue alloc] initWithPath:[WTCoreDataFMDB databasePath]];
         [self createTableInfo];
     }
     return self;
